@@ -13,7 +13,7 @@ router.route('/')
   .get(get_all_tasks)
   .post(create_task)
 // prettier-ignore
-router.route('/:id')
+router.route('/')
   .get(get_task)
   .patch(update_task)
   .delete(delete_task)

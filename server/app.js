@@ -3,16 +3,15 @@ const app = express()
 const connect_db = require('./db/connect')
 const PORT = 3000
 const tasks_routes = require('./routes/tasks_routes')
+const cors = require('cors')
+const cors_options = require('./config/cors_options')
 require('dotenv').config()
 
 // middleware
 app.use(express.json())
+app.use(cors(cors_options))
 
 // routes
-app.get('/hello', (req, res) => {
-  res.send('Task manager app')
-})
-
 app.use('/api/v1/tasks', tasks_routes)
 
 const start = async () => {
