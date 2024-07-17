@@ -7,6 +7,7 @@ const auth_routes = require('./routes/auth/auth_routes')
 const cors = require('cors')
 const cors_options = require('./config/cors_options')
 const not_found = require('./middleware/not_found')
+const asyncHandler = require('express-async-handler')
 require('dotenv').config()
 
 // middleware
@@ -18,12 +19,8 @@ app.use('/api/v1/tasks', tasks_routes)
 app.use('/api/v1/auth', auth_routes)
 app.use(not_found)
 
-const start = async () => {
-  try {
-    await connect_db(process.env.MONGO_URI)
-    app.listen(PORT, console.log(`server is listening on port ${PORT}...`))
-  } catch (err) {
-    console.error(err)
-  }
-}
+const start = asyncHandler(async () => {
+  await connect_db(process.env.MONGO_URI)
+  app.listen(PORT, console.log(`server is listening on port ${PORT}...`))
+})
 start()

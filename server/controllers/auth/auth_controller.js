@@ -10,7 +10,7 @@ const registr = asyncHandler(async (req, res, next) => {
 
   const dublicate = await User.findOne({ email }).lean().exec()
   if (dublicate) {
-    return res.status(400).json({ message: `Email taken.` })
+    return res.status(409).json({ message: `Email taken.` })
   }
 
   const hash = await bcrypt.hash(password, 10)
