@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import EditIcon from '@mui/icons-material/Edit'
-import DownloadDoneIcon from '@mui/icons-material/DownloadDone'
 import DeleteIcon from '@mui/icons-material/Delete'
 import Switch from '@mui/material/Switch'
 
@@ -10,6 +9,7 @@ function App() {
   const [loading, setLoading] = useState(true)
 
   const [input, setInput] = useState('')
+  const input_ref = useRef()
 
   const get_data = async () => {
     try {
@@ -84,7 +84,7 @@ function App() {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            name: data.name,
+            name: data.name.trim(),
             _id: data._id,
           }),
         })
@@ -97,7 +97,33 @@ function App() {
       } catch (err) {
         return console.error(err)
       } finally {
-        data.e.target.value = ''
+        data.e.target.contentEditable = 'false'
+        get_data()
+      }
+    }
+    edit_data()
+  }
+
+  const handleSwitch = async (data) => {
+    const edit_data = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/v1/tasks', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            completed: data.value,
+            _id: data.item._id,
+          }),
+        })
+
+        if (!response.ok) {
+          throw new Error(`HTTP Error: Status ${response.status}`)
+        }
+        let result = await response.json()
+        console.log(result)
+      } catch (err) {
+        return console.error(err)
+      } finally {
         get_data()
       }
     }
@@ -118,6 +144,7 @@ function App() {
             </h1>
             <form className="mt-6 flex" onSubmit={handleSubmit}>
               <input
+                ref={input_ref}
                 required
                 minLength={3}
                 maxLength={24}
@@ -148,25 +175,25 @@ function App() {
                 >
                   <div className="flex gap-4">
                     <Switch
-                      // onChange={(e) => {
-                      //   handleEdit(item)
-                      // }}
+                      onChange={(e) => {
+                        handleSwitch({ item, value: e.target.checked })
+                      }}
                       className="cursor-pointer"
                       checked={item.completed ? true : false}
                     />
                     <div
                       suppressContentEditableWarning={true}
-                      className="w-full flex items-center justify-center outline-none min-w-2 placeholder:text-black"
+                      className="w-60 grid items-center outline-none placeholder:text-black"
                       style={{
                         textDecoration: item.completed
                           ? 'line-through'
                           : 'none',
                       }}
-                      // placeholder={item.name}
                       onChange={(e) => {
                         item.name = e.target.value
                       }}
                       onBlur={(e) => {
+                        e.target.contentEditable = 'false'
                         handleEdit({
                           name: e.target.textContent,
                           _id: item._id,
@@ -176,21 +203,23 @@ function App() {
                       onKeyDown={(e) => {
                         e.key === 'Enter'
                           ? handleEdit({
-                              name: e.target.textContent,
+                              name: item.name,
                               _id: item._id,
                               e,
                             })
                           : null
                       }}
-                      contentEditable
+                      onMouseOver={(e) => {
+                        e.target.contentEditable = 'plaintext-only'
+                      }}
+                      // onMouseLeave={(e) => {
+                      //   e.target.contentEditable = 'false'
+                      // }}
                     >
                       {item.name}
                     </div>
                   </div>
                   <div className="flex gap-4">
-                    <div className="w-8 h-8 cursor-pointer rounded-full hover:bg-slate-200 flex items-center justify-center">
-                      <EditIcon />
-                    </div>
                     <div
                       className="w-8 h-8 cursor-pointer rounded-full hover:bg-slate-200 flex items-center justify-center"
                       onClick={() => {
