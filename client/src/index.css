@@ -9,4 +9,5 @@
 
 #root {
   display: block;
+  position: relative;
 }
