@@ -14,7 +14,7 @@ export default function Registr() {
   const focus_pwd = useRef()
   const focus_confirm = useRef()
 
-  const [err, setErr] = useState('')
+  const [err, setErr] = useState(null)
   const [success, setSuccess] = useState('')
   const [mountEmail, setMountEmail] = useState(true)
   const [mountPwd, setMountPwd] = useState(true)
@@ -65,7 +65,7 @@ export default function Registr() {
       setErr('Invalid email recieved.')
       setLoading(false)
       focus_email.current.focus()
-      focus_email.current.style.outline = '2px solid red'
+      focus_email.current.style.ouline = '2px solid red'
       return
     }
     if (!v2) {
@@ -123,9 +123,9 @@ export default function Registr() {
   }
 
   const handleBlur = () => {
-    focus_confirm.current.style.outline = 'none'
-    focus_email.current.style.outline = 'none'
-    focus_pwd.current.style.outline = 'none'
+    // focus_confirm.current.style.outline = 'none'
+    // focus_email.current.style.outline = 'none'
+    // focus_pwd.current.style.outline = 'none'
   }
 
   return (
@@ -157,15 +157,23 @@ export default function Registr() {
                     onChange={(e) => {
                       setEmail(e.target.value)
                       mountEmail ? setMountEmail(false) : null
-                      handleBlur()
+                      err ? handleBlur() : null
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.outline = '2px solid blue'
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.outline = ''
                     }}
                     ref={focus_email}
                     aria-describedby="email-d"
                     required
                     type="email"
-                    autoComplete="true"
+                    autoComplete="false"
                     id="email"
-                    style={{ width: '90%' }}
+                    style={{
+                      width: '90%',
+                    }}
                     className="rounded-sm shadow-md outline-none py-1 px-4 text-lg"
                   />
                   {mountEmail ? null : (
@@ -191,7 +199,13 @@ export default function Registr() {
                     onChange={(e) => {
                       setPwd(e.target.value)
                       mountPwd ? setMountPwd(false) : null
-                      handleBlur()
+                      err ? handleBlur() : null
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.outline = ''
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.outline = '2px solid blue'
                     }}
                     ref={focus_pwd}
                     aria-describedby="pwd-d"
@@ -225,7 +239,13 @@ export default function Registr() {
                     onChange={(e) => {
                       setSubmit(e.target.value)
                       mountSubmit ? setMountSubmit(false) : null
-                      handleBlur()
+                      err ? handleBlur() : null
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.outline = ''
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.outline = '2px solid blue'
                     }}
                     ref={focus_confirm}
                     aria-describedby="pwd-d"
@@ -253,7 +273,7 @@ export default function Registr() {
               <div className="flex items-center justify-center w-11/12">
                 <button
                   disabled={loading ? true : false}
-                  className="border rounded py-2 px-20 mt-4 shadow-md text-lg font-bold hover:shadow-xl transition-shadow active:shadow-none flex items-center gap-4 relative cursor-pointer"
+                  className="border rounded py-2 px-20 mt-4 shadow-md text-lg font-bold hover:shadow-xl transition-shadow active:shadow-none flex items-center gap-4 relative cursor-pointer outline-blue-700"
                 >
                   Submit
                   <div className="absolute right-8">
