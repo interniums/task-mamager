@@ -20,7 +20,7 @@ app.use(cors(cors_options))
 app.use('/api/v1/auth', auth_routes)
 
 // protected routes
-app.use(jwtVerify)
+// app.use(jwtVerify)
 app.use('api/v1/home', home_routes)
 app.use('/api/v1/tasks', tasks_routes)
 

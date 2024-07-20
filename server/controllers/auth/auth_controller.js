@@ -2,6 +2,7 @@ const User = require('../../models/user_model')
 const asyncHandler = require('express-async-handler')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const { urlencoded } = require('express')
 
 const registr = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body
@@ -35,24 +36,43 @@ const login = asyncHandler(async (req, res, next) => {
 
   const user = await User.findOne({ email }).exec()
   if (!user) {
-    return res
-      .status(404)
-      .json({ message: `User with provided email not found.` })
+    return res.status(401).json({
+      message: `User with provided email not found.`,
+      err_code: 'email',
+    })
   }
 
   const match = await bcrypt.compare(password, user.password)
   if (!match) {
-    return res.status(400).json({ message: 'Incorrect password.' })
+    return res
+      .status(400)
+      .json({ message: 'Incorrect password.', err_code: 'password' })
   }
 
-  if (user && match) {
-    const token = jwt.sign({ email, id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '1d',
-    })
-    res.status(200).json({ message: `Logined successfully.`, token })
-  } else {
-    res.status(400).json({ message: 'Invalid user data recieved.' })
-  }
+  const access_token = jwt.sign(
+    {
+      user_info: {
+        email: user.email,
+      },
+    },
+    process.env.ACCESS_SECRET,
+    { expiresIn: '15m' }
+  )
+
+  const refresh_token = jwt.sign(
+    { email: user.email },
+    process.env.REFRESH_SECRET,
+    { expiresIn: '7d' }
+  )
+
+  res.cookie('jwt', refresh_token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: false,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  })
+
+  res.json({ access_token })
 })
 
 module.exports = { registr, login }

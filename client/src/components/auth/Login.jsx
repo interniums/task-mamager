@@ -2,14 +2,12 @@ import CloseIcon from '@mui/icons-material/Close'
 import CheckIcon from '@mui/icons-material/Check'
 import loadingSvg from '../../assets/loading.svg'
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 
 const EMAIL_REGEX = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,24}$/
 
 export default function Login() {
-  const navigate = useNavigate()
   const focus_email = useRef()
   const focus_pwd = useRef()
 
@@ -24,7 +22,6 @@ export default function Login() {
 
   const [pwd, setPwd] = useState('')
   const [validPwd, setValidPwd] = useState(false)
-  console.log(err)
 
   useEffect(() => {
     !success ? focus_email.current.focus() : null
@@ -63,7 +60,7 @@ export default function Login() {
 
     try {
       const response = await fetch(
-        'http://localhost:3000/api/v1/auth/sign-up',
+        'http://localhost:3000/api/v1/auth/sign-in',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -79,18 +76,25 @@ export default function Login() {
       }
       const result = await response.json()
       console.log(result)
+      console.log()
 
-      if (response?.status === 409) {
+      if (result?.err_code === 'email') {
         focus_email.current.focus()
         focus_email.current.style.outline = '2px solid red'
         setValidEmail(false)
-        setErr(result.message)
-        return
+      }
+
+      if (result?.err_code === 'password') {
+        focus_pwd.current.focus()
+        focus_pwd.current.style.outline = '2px solid red'
+        setValidPwd(false)
       }
 
       if (response?.status === 400) {
         setErr(result.message)
       } else if (response?.status === 200) {
+        const token = result?.token
+        console.log(token)
         setSuccess('User created')
       }
     } catch (err) {
@@ -100,15 +104,8 @@ export default function Login() {
     }
   }
 
-  const handleBlur = () => {
-    // focus_confirm.current.style.outline = 'none'
-    // focus_email.current.style.outline = 'none'
-    // focus_pwd.current.style.outline = 'none'
-  }
-
   return (
     <main
-      onClick={handleBlur}
       style={{ height: '2000px' }}
       className="min-h-screen max-h-max w-full bg-slate-100 flex justify-center items-start pt-14"
     >
@@ -119,11 +116,11 @@ export default function Login() {
           </div>
         </div>
       ) : null}
-      <section className="border rounded shadow-md pt-8 p-12 pr-4 font-mono w-2/4">
+      <section className="border rounded shadow-md pt-8 p-12 pb-6 pr-4 font-mono w-2/4">
         {!success ? (
           <>
             <div>
-              <h1 className="font-bold text-3xl text-center mr-8">Sign-up</h1>
+              <h1 className="font-bold text-3xl text-center mr-8">Sign-in</h1>
             </div>
             <form onSubmit={handleSubmit}>
               <div className="grid grid-rows-1 mb-4 mt-6">
@@ -135,7 +132,6 @@ export default function Login() {
                     onChange={(e) => {
                       setEmail(e.target.value)
                       mountEmail ? setMountEmail(false) : null
-                      err ? handleBlur() : null
                     }}
                     onFocus={(e) => {
                       e.target.style.outline = '2px solid blue'
@@ -177,7 +173,6 @@ export default function Login() {
                     onChange={(e) => {
                       setPwd(e.target.value)
                       mountPwd ? setMountPwd(false) : null
-                      err ? handleBlur() : null
                     }}
                     onBlur={(e) => {
                       e.target.style.outline = ''
@@ -208,47 +203,7 @@ export default function Login() {
                   )}
                 </div>
               </div>
-              <div className="grid grid-rows-1 mb-4">
-                <label htmlFor="confirm" className="text-lg font-bold mb-1">
-                  Confirm password:
-                </label>
-                <div className="flex items-center justify-between">
-                  <input
-                    onChange={(e) => {
-                      setSubmit(e.target.value)
-                      mountSubmit ? setMountSubmit(false) : null
-                      err ? handleBlur() : null
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.outline = ''
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.outline = '2px solid blue'
-                    }}
-                    ref={focus_confirm}
-                    aria-describedby="pwd-d"
-                    minLength={8}
-                    required
-                    type="password"
-                    id="confirm"
-                    style={{ width: '90%' }}
-                    className="rounded-sm shadow-md outline-none py-1 px-4 text-lg"
-                  />
-                  {mountSubmit ? null : (
-                    <div
-                      style={{ width: '6%' }}
-                      className="flex items-center justify-center"
-                    >
-                      {validSubmit == true ? (
-                        <CheckIcon sx={{ color: 'rgb(0, 200, 0)' }} />
-                      ) : (
-                        <CloseIcon sx={{ color: 'rgb(200, 0, 0)' }} />
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center justify-center w-11/12">
+              <div className="grid items-center justify-center w-11/12">
                 <button
                   disabled={loading ? true : false}
                   className="border rounded py-2 px-20 mt-4 shadow-md text-lg font-bold hover:shadow-xl transition-shadow active:shadow-none flex items-center gap-4 relative cursor-pointer outline-blue-700"
@@ -264,23 +219,25 @@ export default function Login() {
                     ) : null}
                   </div>
                 </button>
+                <Link to="/sign-up">
+                  <h2 className="mt-6 hover:text-blue-600">
+                    Don't have an account?
+                  </h2>
+                </Link>
               </div>
             </form>
           </>
         ) : (
           <div className="grid gap-8 pr-8">
             <h1 className="text-center text-3xl font-bold">
-              Registration successfull!
+              Login successfull!
             </h1>
             <div className="w-full ">
-              <Link to="/">
+              <Link to="/home">
                 <button className="w-full border rounded py-2 px-20 shadow-md text-lg font-bold hover:shadow-xl transition-shadow active:shadow-none cursor-pointer text-center bg-green-100">
                   Home
                 </button>
               </Link>
-              <button className="w-full border rounded py-2 px-20 mt-4 shadow-md text-lg font-bold hover:shadow-xl transition-shadow active:shadow-none cursor-pointer text-center bg-green-100">
-                <Link to="/login">Sign-in</Link>
-              </button>
             </div>
           </div>
         )}

@@ -2,14 +2,12 @@ import CloseIcon from '@mui/icons-material/Close'
 import CheckIcon from '@mui/icons-material/Check'
 import loadingSvg from '../../assets/loading.svg'
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 
 const EMAIL_REGEX = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,24}$/
 
 export default function Registr() {
-  const navigate = useNavigate()
   const focus_email = useRef()
   const focus_pwd = useRef()
   const focus_confirm = useRef()
@@ -29,8 +27,6 @@ export default function Registr() {
 
   const [submit, setSubmit] = useState('')
   const [validSubmit, setValidSubmit] = useState(false)
-
-  console.log(err)
 
   useEffect(() => {
     !success ? focus_email.current.focus() : null
@@ -122,15 +118,8 @@ export default function Registr() {
     }
   }
 
-  const handleBlur = () => {
-    // focus_confirm.current.style.outline = 'none'
-    // focus_email.current.style.outline = 'none'
-    // focus_pwd.current.style.outline = 'none'
-  }
-
   return (
     <main
-      onClick={handleBlur}
       style={{ height: '2000px' }}
       className="min-h-screen max-h-max w-full bg-slate-100 flex justify-center items-start pt-14"
     >
@@ -141,7 +130,7 @@ export default function Registr() {
           </div>
         </div>
       ) : null}
-      <section className="border rounded shadow-md pt-8 p-12 pr-4 font-mono w-2/4">
+      <section className="border rounded shadow-md pt-8 pb-6 p-12 pr-4 font-mono w-2/4">
         {!success ? (
           <>
             <div>
@@ -157,7 +146,6 @@ export default function Registr() {
                     onChange={(e) => {
                       setEmail(e.target.value)
                       mountEmail ? setMountEmail(false) : null
-                      err ? handleBlur() : null
                     }}
                     onFocus={(e) => {
                       e.target.style.outline = '2px solid blue'
@@ -199,7 +187,6 @@ export default function Registr() {
                     onChange={(e) => {
                       setPwd(e.target.value)
                       mountPwd ? setMountPwd(false) : null
-                      err ? handleBlur() : null
                     }}
                     onBlur={(e) => {
                       e.target.style.outline = ''
@@ -239,7 +226,6 @@ export default function Registr() {
                     onChange={(e) => {
                       setSubmit(e.target.value)
                       mountSubmit ? setMountSubmit(false) : null
-                      err ? handleBlur() : null
                     }}
                     onBlur={(e) => {
                       e.target.style.outline = ''
@@ -270,7 +256,7 @@ export default function Registr() {
                   )}
                 </div>
               </div>
-              <div className="flex items-center justify-center w-11/12">
+              <div className="grid items-center justify-center w-11/12">
                 <button
                   disabled={loading ? true : false}
                   className="border rounded py-2 px-20 mt-4 shadow-md text-lg font-bold hover:shadow-xl transition-shadow active:shadow-none flex items-center gap-4 relative cursor-pointer outline-blue-700"
@@ -286,6 +272,11 @@ export default function Registr() {
                     ) : null}
                   </div>
                 </button>
+                <Link to="/sign-up">
+                  <h2 className="mt-6 hover:text-blue-600">
+                    Already have an account?
+                  </h2>
+                </Link>
               </div>
             </form>
           </>

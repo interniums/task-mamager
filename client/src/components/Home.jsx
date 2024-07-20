@@ -211,9 +211,6 @@ function Home() {
                       onMouseOver={(e) => {
                         e.target.contentEditable = 'plaintext-only'
                       }}
-                      // onMouseLeave={(e) => {
-                      //   e.target.contentEditable = 'false'
-                      // }}
                     >
                       {item.name}
                     </div>
