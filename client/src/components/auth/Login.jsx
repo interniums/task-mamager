@@ -1,8 +1,9 @@
 import CloseIcon from '@mui/icons-material/Close'
 import CheckIcon from '@mui/icons-material/Check'
 import loadingSvg from '../../assets/loading.svg'
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import AuthContext from '../../context/AuthProvider'
 
 const EMAIL_REGEX = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,24}$/
@@ -11,6 +12,7 @@ export default function Login() {
   const focus_email = useRef()
   const focus_pwd = useRef()
 
+  const { setAuth, auth } = useContext(AuthContext)
   const [err, setErr] = useState(null)
   const [success, setSuccess] = useState('')
   const [mountEmail, setMountEmail] = useState(true)
@@ -76,7 +78,6 @@ export default function Login() {
       }
       const result = await response.json()
       console.log(result)
-      console.log()
 
       if (result?.err_code === 'email') {
         focus_email.current.focus()
@@ -93,9 +94,10 @@ export default function Login() {
       if (response?.status === 400) {
         setErr(result.message)
       } else if (response?.status === 200) {
-        const token = result?.token
-        console.log(token)
-        setSuccess('User created')
+        const access_token = result?.access_token
+        setAuth({ email, pwd, access_token })
+        console.log(auth)
+        setSuccess('User created.')
       }
     } catch (err) {
       setErr(`${err}`)
