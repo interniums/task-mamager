@@ -25,6 +25,8 @@ export default function Login() {
   const [pwd, setPwd] = useState('')
   const [validPwd, setValidPwd] = useState(false)
 
+  console.log(auth)
+
   useEffect(() => {
     !success ? focus_email.current.focus() : null
   }, [])
@@ -96,7 +98,6 @@ export default function Login() {
       } else if (response?.status === 200) {
         const access_token = result?.access_token
         setAuth({ email, pwd, access_token })
-        console.log(auth)
         setSuccess('User created.')
       }
     } catch (err) {

@@ -7,29 +7,35 @@ import Home from './components/Home.jsx'
 import Registr from './components/auth/Regist.jsx'
 import Login from './components/auth/Login.jsx'
 import ErrorPage from './components/Error.jsx'
+import { AuthProvider } from './context/AuthProvider.jsx'
 
 const router = createBrowserRouter([
   {
-    path: '/home',
-    element: <Home />,
+    path: '/',
+    element: <App />,
     errorElement: <ErrorPage />,
-  },
-  {
-    path: '/sign-up',
-    element: <Registr />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/sign-in',
-    element: <Login />,
-    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: '/home',
+        element: <Home />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: '/sign-up',
+        element: <Registr />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: '/sign-in',
+        element: <Login />,
+        errorElement: <ErrorPage />,
+      },
+    ],
   },
 ])
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <RouterProvider router={router}>
-      <App />
-    </RouterProvider>
+    <RouterProvider router={router}></RouterProvider>
   </React.StrictMode>
 )
