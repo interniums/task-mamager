@@ -8,6 +8,7 @@ import Registr from './components/auth/Regist.jsx'
 import Login from './components/auth/Login.jsx'
 import ErrorPage from './components/Error.jsx'
 import { AuthProvider } from './context/AuthProvider.jsx'
+import RequireAuth from './components/auth/RequireAuth.jsx'
 
 const router = createBrowserRouter([
   {
@@ -15,11 +16,6 @@ const router = createBrowserRouter([
     element: <App />,
     errorElement: <ErrorPage />,
     children: [
-      {
-        path: '/home',
-        element: <Home />,
-        errorElement: <ErrorPage />,
-      },
       {
         path: '/sign-up',
         element: <Registr />,
@@ -29,6 +25,16 @@ const router = createBrowserRouter([
         path: '/sign-in',
         element: <Login />,
         errorElement: <ErrorPage />,
+      },
+      {
+        element: <RequireAuth />,
+        children: [
+          {
+            path: '/home',
+            element: <Home />,
+            errorElement: <ErrorPage />,
+          },
+        ],
       },
     ],
   },

@@ -1,9 +1,9 @@
 import CloseIcon from '@mui/icons-material/Close'
 import CheckIcon from '@mui/icons-material/Check'
 import loadingSvg from '../../assets/loading.svg'
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import AuthContext from '../../context/AuthProvider'
+import useAuth from '../../hooks/useAuth'
 
 const EMAIL_REGEX = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,24}$/
@@ -12,12 +12,13 @@ export default function Login() {
   const focus_email = useRef()
   const focus_pwd = useRef()
 
-  const { setAuth, auth } = useContext(AuthContext)
+  const { setAuth, auth } = useAuth()
   const [err, setErr] = useState(null)
   const [success, setSuccess] = useState('')
   const [mountEmail, setMountEmail] = useState(true)
   const [mountPwd, setMountPwd] = useState(true)
   const [loading, setLoading] = useState(false)
+  console.log(err)
 
   const [email, setEmail] = useState('')
   const [validEmail, setValidEmail] = useState(false)
